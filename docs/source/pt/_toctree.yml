@@ -28,3 +28,6 @@
   - local: multilingual
     title: Modelos multilinguísticos para inferência
   title: Guias práticos
+  - sections:
+    - local: philosophy
+      title: Filosofia
