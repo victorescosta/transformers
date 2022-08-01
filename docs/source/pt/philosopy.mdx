@@ -1,0 +1,63 @@
+<!--Copyright 2020 A equipe HuggingFace. Todos os direitos reservados.
+
+Licenciado sob a Licença Apache, Versão 2.0 (a "Licença"); você não pode usar este arquivo exceto em conformidade com
+a licença. Você pode obter uma cópia da Licença em
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+A menos que exigido pela lei aplicável ou acordado por escrito, o software distribuído sob a Licença é distribuído em
+uma BASE "AS IS", SEM GARANTIAS OU CONDIÇÕES DE QUALQUER TIPO, expressas ou implícitas. Consulte a Licença para o
+idioma específico que rege as permissões e limitações sob a Licença.
+-->
+
+# Filosofia
+
+🤗 Transformers é uma biblioteca obstinada e construída para:
+
+- Pesquisadores em NLP e educadores que buscam usar/estudar/estender modelos transformers em larga escala
+- Praticantes que querem fazer ajustes finos nesses modelos e/ou usa-los em produção
+- Engenheiros que apenas querem baixar um modelo pré-treinado e resolver algumas tarefas dadas de NLP.
+
+A biblioteca foi construída com dois grandes objetivos em mente:
+
+- Ser mais fácil e rápida de usar possível:
+
+  - Limitamos fortemente o número de abstrações voltadas para o usuário para aprender, de fato, quase não há abstrações, apenas três classes padrão necessárias para usar cada modelo: [configuration](main_classes/configuration),
+    [models](main_classes/model) e [tokenizer](main_classes/tokenizer).
+  - Todas essas classes podem ser inicializadas de forma simples e unificada a partir de instâncias pré-treinadas usando um método comum de instanciação `from_pretrained()` que cuidará do download (se necessário), cache e carregamento da instância de classe relacionada e dados associados (configurações de hiperparâmetros, vocabulário de tokenizers e pesos de modelos) de um checkpoint pré-treinado fornecido no [Hugging Face Hub](https://huggingface.co/models) ou em seu próprio checkpoint salvo.
+  - Além dessas três classes base, a biblioteca fornece duas APIs: [`pipeline`] para usar rapidamente um modelo (mais seu tokenizer e configuração associados) em uma determinada tarefa e [`Trainer`]/`Keras.fit` para rapidamente treinar ou ajustar um determinado modelo.
+  - Como consequência, esta biblioteca NÃO é uma caixa de ferramentas modular de blocos de construção para redes neurais. Se você quiser estender/construir a biblioteca, basta usar módulos Python/PyTorch/TensorFlow/Keras regulares e herdar das classes base da biblioteca para reutilizar funcionalidades como carregamento/salvamento de modelo.
+
+- Fornecer modelos de última geração com desempenhos o mais próximo possível dos modelos originais:
+
+  - Fornecemos pelo menos um exemplo para cada arquitetura que reproduz um resultado fornecido pelos autores oficiais da referida arquitetura.
+  - O código geralmente é o mais próximo possível da base de código original, o que significa que alguns códigos PyTorch podem não ser tão *pytorchico* quanto poderiam ser como resultado da conversão do código TensorFlow e vice-versa.
+
+Alguns outros objetivos:
+
+- Expor as partes internas dos modelos da forma mais consistente possível:
+
+  - Damos acesso, usando uma única API, a todos os estados ocultos e pesos de atenção.
+  - A API do tokenizer e do modelo base é padronizada para alternar facilmente entre os modelos.
+
+- Incorporar uma seleção subjetiva de ferramentas promissoras para refinar/investigar esses modelos:
+
+  - Uma maneira simples/consistente de adicionar novos tokens ao vocabulário e embeddings para ajuste fino.
+  - Maneiras simples de mascarar e podar cabeças de transformers.
+
+- Alterne facilmente entre PyTorch e TensorFlow 2.0, permitindo treinamento usando uma estrutura de uma e inferência de outra.
+
+## Principais conceitos
+
+A biblioteca é construída em torno de três tipos de classes para cada modelo:
+
+- **Classes de Modelos** como a [`BertModel`], que são mais de 30 modelos PyTorch ([torch.nn.Module](https://pytorch.org/docs/stable nn.html#torch.nn.Module)) ou modelos Keras ([ tf.keras.Model] https://www.tensorflow.org/api_docs/python/tf/keras/Model)) que funcionam com os pesos pré-treinados fornecidos na biblioteca.
+- **Classes de Configuração** como a [`BertConfig`], que armazenam todos os parâmetros necessários para construir um modelo. Você nem sempre precisa instanciar isso sozinho. Em particular, se você estiver usando um modelo pré-treinado sem nenhuma modificação, a criação do modelo cuidará automaticamente da instanciação da configuração (que faz parte do modelo).
+- **Classes de Tokenizers** como a [`BertTokenizer`], que armazenam o vocabulário para cada modelo e fornecem métodos para codificar/decodificar strings em uma lista de índices de incorporação de tokens a serem alimentados em um modelo.
+
+Todas essas classes podem ser instanciadas a partir de instâncias pré-treinadas e salvas localmente usando dois métodos:
+
+- `from_pretrained()` permite instanciar um modelo/configuração/tokenizer de uma versão pré-treinada fornecida pela própria biblioteca (os modelos suportados podem ser encontrados no [Model Hub](https://huggingface.co/models)) ou armazenados localmente (ou em um servidor) pelo usuário,
+- `save_pretrained()` permite que você salve um modelo/configuração/tokenizer localmente para que possa ser recarregado usando
+  `from_pretrained()`.
+
